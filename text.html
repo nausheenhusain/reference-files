@@ -1,0 +1,243 @@
+<!-- This html file contains commonly-used Jinja tips and tricks. -->
+
+<!--
+More techniques:
+* pie charts with css and spreadsheet data: refugees-in-illinois
+* chartist charts in sand-depletion-waukegan-zion
+* creating a lookup with visualization per town in tribune_education-by-town
+-->
+
+{{ intro_chatter|markdown }}
+
+<!-- Trib standard legend/key -->
+<dl class="legend trib-legend--inline">
+	<dt><span class="box" style="background-color:#B4DDB5"></span></dt> <dd>One star</dd>
+	<dt><span class="box" style="background-color:#4DA84E"></span></dt> <dd>Two stars</dd>
+	<dt><span class="box" style="background-color:#2E652F"></span></dt> <dd>Three stars</dd>
+</dl>
+
+<!-- Bootstrap dropdown button -->
+<div class='buttons'>
+  <div class="row centered dropdown">
+      <button id="standard-button" type="button" class="btn dropdown-toggle" data-toggle="dropdown">select unit
+        <div class="caret"></div>
+      </button>
+        <ul class="dropdown-menu scrollable-menu" id="unit-dropdown-menu" ="menu">
+          {% for row in data %}
+              <li class="standard-button" data-content-id="{{ row.ID }}"> {{ row.unit|markdown }}</li>
+          {% endfor %}
+        </ul>
+  </div>
+</div>
+
+<!-- Basic for loop strategies -->
+<!-- Sort sorts as ascending automatically -->
+{% for row in data|sort(attribute='town') %}
+<!-- i counts loops -->
+{% set i = loop.index %}
+
+  <!-- Use a spreadsheet column to set for certain rows -->
+  {% if row.class == "bold" %}
+    {% set classes = "bold" %}
+  {% else %}
+    {% set classes = "normal" %}
+  {% endif %}
+
+  <!--
+  Skip the first line of the dataset (typically because the first line has
+  definitions/explanations of column names)
+  -->
+  {% if loop.index > 1 %}
+
+    <!-- Data-content-id can be used in JS for scrolling purposes. -->
+    <!-- Clearfix is used to contain items bigger than their containers. -->
+    <div id="content-wrap{{ row.ID }}" class="box clearfix" data-content-id="{{ row.ID }}">
+      <!-- 'upper' makes the title fully uppercase -->
+      <!-- '.label2' needs to be included in h2 SASS -->
+      <h2 class="label2">{{ row.title|upper }}</h2>
+
+      <!-- If you'll need to build the same thing for each row, you can factor this out. -->
+      {% include '_box.html' %}
+
+      <!--
+      Create a specific number of repeated images based on the number in a cell (row.amount).
+      You can use `justify-content:flex-start` (See sample-project-files/styles.scss) on repeating images to make sure they
+      are justified toward the beginning of each row.
+      -->
+      {% for icons in range(row.amount) %}
+        <img class="repeated-image {{ classes }}" src="http://{{ ROOT_URL }}/{{ row.img }}" />
+      {% endfor %}
+
+      <!-- Standard back-to-top button -->
+      <div class="scroll-row">
+        <a href="#" class="scrollToTop">BACK TO TOP</a>
+      </div>
+
+      <!-- if loop count is divisible by 4, add a jump to top buttons link -->
+      {% if i % 4 == 0 %}
+        <a class="jump-to-top" href="#standard-button">Jump to top</a>
+      {% endif %}
+
+    </div>
+
+
+  {% endif %}
+{% endfor %}
+
+<!-- Insert a responsive iframe - responsiveness rules in styles -->
+<div class='embed_16x9'>
+    <iframe src="https://www.youtube.com/embed/RGJb2iLvOKE" frameborder="0" allowfullscreen></iframe>
+</div>
+
+<!-- Insert a blockquote with attribution -->
+<blockquote>
+	<p>{{ movie_quote|process_text }}</p>
+	<small> — Shannon Hoff, Fluidity Design Consultants' principal and managing director </small>
+</blockquote>
+
+<!-- Use for loop to build a bar chart in a table with info in spreadsheet
+This is originally in chicago-housing-authority
+-->
+
+<!-- sorts bars by percentage column -->
+<table class='units'>
+	<thead>
+		<tr class='unit'>
+			<th class='unit__name'><strong>{{ unit_label }}</strong>
+			</th>
+			<th class='unit__label'><strong>{{ price_label }}</strong>
+			</th>
+			<th><strong>{{ percent_label }}</strong>
+			</th>
+		</tr>
+	</thead>
+<tbody>
+{%- for unit in units|sort(false, attribute="percent_change") -%}
+			{% set u = unit %}
+			<tr class='unit'>
+				{% if u.Unit == "Widget" %}
+					<td class="unit__name" id="widget-bold">{{ u.Unit }}</td>
+          <!-- make these prices formatted with commas -->
+          <td class='unit_price' id="widget-normal">${{ u.price|int|int_commas }}</td>
+					<td class='unit__bar'>
+				{% else %}
+					<td class='unit__name'>{{ u.Unit }}</td>
+					<td class='unit__price'>${{ c.price|int|int_commas }}</td>
+					<td class='unit__bar'>
+				{% endif %}
+          <!-- this handles negative percentages -->
+          {%- if u.bar_width < 0 %}
+						{% set width = (u.bar_width * -1) ~ "%" %}
+						{% set margin_left = u.bar_width ~ "%" %}
+						{% set left = "50%" %}
+						{% set class = "negative" %}
+						{% set bar_margin_left = (50 + u.bar_width) ~ "%" %}
+					{%- else %}
+						{% set width = u.bar_width ~ "%" %}
+						{% set margin_left = 0 %}
+						{% set left = "50%" %}
+						{% set class = "" %}
+						{% set bar_margin_left = u.bar_width ~ "%" %}
+					{%- endif %}
+					{% if c.Unit == "Widget" %}
+					<div class='bar'
+						style='background:#C11B17;margin-left:{{ margin_left }};left:{{ left }};width:{{ width }}'>
+					</div>
+					<span class='unit__bar-label {{ class }}'
+						style='color:black;margin-left:{{ bar_margin_left }};'>
+						{{ c.percent_change }}%
+					</span>
+					{% else %}
+					<div class='bar {{ class }}'
+						style='margin-left:{{ margin_left }};left:{{ left }};width:{{ width }}'>
+					</div>
+					<span class='unit__bar-label {{ class }}'
+						style='margin-left:{{ bar_margin_left }};'>
+						{{ c.percent_change }}%
+					</span>
+					{% endif %}
+				</td>
+			</tr>
+		{%- endfor -%}
+  </tbody>
+</table>
+
+<!-- Splits bar up into percentages via spreadsheet -->
+<dl class='bills-legend'>
+		<h2 class="label7">Bills by amounts</h2>
+		<dt><span class="box" style="background-color:#CBDDED;"></span></dt><dd> less than $10,000</dd>
+		<dt><span class="box" style="background-color:#85B4D3;"></span></dt><dd>$10,000 to $100,000 </dd>
+		<dt><span class="box" style="background-color:#7493C1;"></span></dt><dd>$100,000 to $500,000</dd>
+		<dt><span class="box" style="background-color:#004E87;"></span></dt><dd>$500,000 to $1 million</dd>
+		<dt><span class="box" style="background-color:#AAAAAA;"></span></dt><dd>more than $1 million</dd>
+</dl>
+
+<div id="bill-amounts-background-bar" class="amounts-bar">
+	<div style="background-color:#CBDDED;width:{{bills_under_tengrand}}%;" class="amounts-bar"></div>
+	<div style="background-color:#85B4D3;width:{{bills_under_hundred}}%;" class="amounts-bar"></div>
+	<div style="background-color:#7493C1;width:{{bills_under_fivehundred}}%;"  class="amounts-bar"></div>
+	<div style="background-color:#004E87;width:{{bills_under_onemil}}%;" class="amounts-bar"></div>
+</div>
+
+<!-- Standard datatable as used in cps-budget-2017-18 -->
+
+<section id="funding-table">
+		<table>
+			<thead>
+				<tr>
+					<th colspan="2">School</th>
+					<th> Projected 2018 enrollment </th>
+					<th class="desktop tablet"> Enrollment change from 2017 </th>
+					<th> Total 2018 funding ($) </th>
+					<th class="desktop tablet"> Change from 2017 funding ($) </th>
+					<th class="desktop tablet"> Percent change from 2017 funding </th>
+				</tr>
+			</thead>
+			<tbody>
+				{% for row in selected_data %}
+				    {% if row.fundingdecrease == "yes" %}
+					       <tr class="bold_class">
+				    {% else %}
+					       <tr>
+				    {% endif %}
+						<td></td>
+						<td> {{ row.school }} </td>
+						<td> {{ row.enrollment2018 }} </td>
+						<td class="desktop tablet"> {{ row.enrollmentchange }} </td>
+						<td> {{ row.funding2018 }} </td>
+						<td class="desktop tablet"> {{ row.fundingchange }} </td>
+						<td class="desktop tablet"> {{ row.percentchange }} </td>
+					</tr>
+				{% endfor %}
+			</tbody>
+		</table>
+  </section>
+
+<!-- Standard timeline with events in spreadsheet -->
+<section class="timeline">
+{% for event in timeline %}
+	<div class="timeline-module {{ event.event_class }}">
+		<h3 class="timeline-event__date">{{ event.date }}</h3>
+		<p class="timeline-event__description">{{ event.description|markdown }}</p>
+		{% if event.vid %}
+			{% include "_video.html" %}
+			<p class="timeline-event__caption">{{ event.vidcaption }}</p>
+		{% endif %}
+		{% if event.img %}
+			<img class="timeline-event__image" src="http://{{ ROOT_URL}}/imgs/{{ event.img }}">
+			<p class="timeline-event__caption">{{ event.caption }}</p>
+		{% endif %}
+		{% if event.pull_quote %}
+			<div class="pull-quote">
+				<p> {{ event.pull_quote }} </p>
+				<small> {{ event.pull_quote_source|markdown }}</small>
+			</div>
+		{% endif %}
+	</div>
+{% endfor %}
+<section>
+
+<div class="credits">
+  {{ source|markdown }}
+  {{ tag|markdown }}
+</div>

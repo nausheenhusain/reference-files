@@ -1,0 +1,285 @@
+/*This SASS file contains commonly-used tips and tricks.*/
+/*imports go in order: base variables, base mixins, standard variables, project variables*/
+@import 'base-variables';
+@import 'base-mixins';
+
+@import 'trib-typography';
+@import "trib-colors";
+@import 'trib-skeleton';
+@import 'trib-legends';
+
+$breakpoint-mobile: 420px;
+$breakpoint-phablet: 840px;
+$accent_color: $trib_blue4;
+
+
+body { background-color: #fff; }
+
+/*Standard inline legend styles*/
+.legend {
+	@include trib_legend(inline);
+	padding-bottom: 5px;
+}
+.box {
+	display: inline-block;
+    height: 10px;
+    width: 10px;
+    margin: 0 5px 0 0;
+    border-radius: 50%;
+}
+
+/*Keeps iframes responsive, goes with .embed_16x9 class in text.html*/
+@mixin responsive_embed($width:16, $height:9, $padding_top:0){
+	/*the idea here is someone can call the responsive embed by putting the ratios in the mixin.*/
+	/*the default is 16x9*/
+
+	$ratio: percentage($height/$width);
+	position: relative;
+	padding-bottom: $ratio;
+	padding-top: $padding_top;
+	height: 0;
+	iframe {
+		position: absolute;
+		top: 0;
+		left: 0;
+		width: 100%;
+		height: 100%;
+	}
+}
+.embed_16x9{
+  @include responsive_embed(16,9,25px);
+  width: auto;
+  height: auto;
+}
+
+/*sample main p text*/
+p.main-text {
+	@include serif-text(18px, 27px);
+}
+/*sample secondary text*/
+p.secondary-text {
+	@include sans-serif-text(13px, 1.3em);
+}
+
+/*centers things like buttons*/
+.buttons{
+	padding-bottom: 50px;
+	display: flex;
+	justify-content: center;
+	align-items: flex-start;
+  flex-wrap:nowrap;
+	//styles for multiple buttons
+	#before-button, #after-button{
+		background-color: #144a7c;
+    	border-color: #103d66;
+    	color: white;
+		padding: 6px 12px;
+    	margin-bottom: 0;
+    	margin-right: 20px;
+    	font-size: 12px;
+    	font-weight: 400;
+    	line-height: 1.42857143;
+    	text-align: center;
+    	white-space: nowrap;
+    	vertical-align: middle;
+    	cursor: pointer;
+    	border: 1px solid transparent;
+    	border-radius: 0;
+		width: 130px;
+		height: 50px;
+	}
+
+	#standard-button, .dropdown {
+		width: 130px;
+		margin: 0;
+	}
+}
+/*Change color on hover*/
+#standard-button:hover {
+	background-color: $accent_color;
+}
+
+/*Include trib labels as such*/
+h2 {
+	@include label2();
+}
+
+/*Should make sure everything in box is contained.*/
+.box {
+	@include clearfix();
+}
+
+/*This is a sass loop that sets max-widths for all labels between 1 and 6.*/
+/*More here: http://thesassway.com/intermediate/if-for-each-while*/
+@for $i from 1 through 6 {
+	.trb_mainContent .label#{$i} {
+		max-width: none;
+
+		/*inserts something before every .label*/
+		&:before {
+			content: "\201C"; //Unicode for left double quote
+		}
+		&:after {
+			content: "U+201D"; //Unicode for right double quote
+		}
+	}
+}
+
+/*justify-content makes sure images justify at beginning of row/div*/
+.repeated-image {
+	justify-content: flex-start;
+	width: 100%;
+}
+
+/*Easily center things -- just add this class to whatever you want to center*/
+.centered {
+  float: none;
+  margin: 0 auto;
+}
+.centered {
+	display: flex;
+	justify-content: center;
+	align-items: flex-start;
+  flex-wrap: nowrap;
+}
+
+/*Agate is useful for very small text, like axes or jump-to-tops*/
+.jump-to-top {
+	@include agate();
+}
+
+/*Styles for an X button that closes tooltip*/
+/*Display toggle would be handled in app.js*/
+#close-button {
+  display: none;
+  background-color: black;
+  text-align: center;
+}
+#close-button span {
+  display: block;
+  padding: 7px 13px;
+  vertical-align: middle;
+  font-size: 13px;
+  font-weight: bold;
+  color: white;
+}
+
+/*Styles for percentages within one bar*/
+#categories-background-bar, #bill-amounts-background-bar {
+	margin-bottom: 10px;
+	background-color:$trib_gray3;
+	border:solid black 1px;
+	float: left;
+	width:100%;
+}
+.amounts-bar, .categories-bar {
+	color:black;
+	text-align:left;
+	font-size: 12px;
+	font-family: Arial, sans-serif;
+	height:50px;
+	float:left;
+}
+
+/*Standard DataTable*/
+#funding-table table {
+	tr.bold_class {
+		td {
+			background-color: #DA1B28;
+			font-weight: bold;
+		}
+	}
+	td {
+		vertical-align: middle;
+		border-bottom: 1px solid black;
+	}
+}
+
+/*Standard timeline styles*/
+.timeline-module:before {height: 13px;width: 13px;left: -14px;}
+.timeline-module {margin-left: 14px;padding:0 0 20px 20px}
+.timeline-module:last-child:after, .timeline-module.last:after {content: ' ';display: inline-block;background-color: #e0e0e0;border: none;border-radius: 0;height: 5px;width: 15px;position: absolute;bottom: 0;left: -10px;}
+.timeline-module.highlight:last-child:after, .timeline-module.highlight.last:after {background-color:#59A8FF;}
+.timeline-event {
+  max-width: 700px;
+  margin: 30px 0;
+  padding-bottom: 15px;
+
+  &:not(:last-of-type) {
+    border-bottom: 1px solid #ccc
+  }
+
+  &__date {
+    text-transform: uppercase;
+    font-family: $font-stack-sans-serif;
+    margin-bottom: 10px;
+  }
+
+  &__image {
+    max-width: 100%;
+    margin-bottom: 20px;
+  }
+}
+p.timeline-event__description {
+	margin-top: 5px;
+}
+p.timeline-event__description--no-counter {
+	width: 100%;
+}
+p.timeline-event__caption {
+	font-family: $font-stack-sans-serif;
+	font-size: 12px;
+	line-height: 17px;
+	color: #999;
+}
+.pull-quote {
+	font-style: italic;
+	color: black;
+	text-align: center;
+	display: block;
+	padding: 20px;
+	margin: 40px 0;
+	background-color:#eee;
+	border-left: 15px solid black;
+	border-right: 2px solid black;
+
+	p {
+		font-size: 22px;
+		line-height: 1.5em;
+		margin:0;
+	}
+}
+
+/*Blockquote styles*/
+blockquote {
+	line-height: 1.4em;
+	font-style: italic;
+	color: black;
+	text-align: justify;
+	display: block;
+	padding: 15px 20px 15px 55px;
+	margin: 40px 0;
+	border-left: 15px solid black;
+	border-right: 2px solid black;
+}
+small{
+	font-size: 14px;
+}
+/*Standard credits style*/
+.credits {
+	@include sans-serif-text(18px, 27px);
+  	line-height: 1.3em;
+  	font-size: 14px;
+  	text-align: left;
+  	font-style: italic;
+  	margin-top: 30px;
+}
+
+/*media queries*/
+@media screen and (max-width: $breakpoint-phablet) {
+
+}
+
+@media screen and (max-width: $breakpoint-mobile) {
+
+}
