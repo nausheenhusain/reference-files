@@ -1,12 +1,12 @@
 //This JS file contains commonly-used tips and tricks.
 
-//Pretty standard ready function for js and jquery
+//Pretty standard ready function for jquery
 $(document).ready(function(){
 
   // Refresh window on resize
   window.onresize = function(){ location.reload(); }
 
-  // JS: on click scroll page down to relevant content
+  // jquery: on click scroll page down to relevant content
   $('.standard-button').on('click', function(){
     $('html, body').animate({
       scrollTop: $('#content-wrap'+$(this).data('content-id')).offset().top
@@ -25,7 +25,7 @@ $(document).ready(function(){
     }
   });
 
-  //JS: click event to scroll to top
+  //jquery: click event to scroll to top
   $('.scrollToTop').click(function(){
     $('html, body').animate({scrollTop : 1000},1000);
     return false;
@@ -37,7 +37,7 @@ $(document).ready(function(){
     $(this).css('display', 'none');
   });
 
-  // JS: standard datatable
+  // jquery: standard datatable
   // You'd have to add datatables into your gruntfile vendor libraries
   var fundingTable =  $('#funding-table table').DataTable({
         "paging": true,
@@ -59,7 +59,7 @@ $(document).ready(function(){
         }
     });
 
-    // JS: show/hide content based on what button is clicked
+    // javascript: show/hide content based on what button is clicked
     // From this: http://graphics.chicagotribune.com/lgbtqia-definition/
     var divs =["lgbtdisplay", "ldisplay", "gdisplay", "bdisplay", "tdisplay", "qdisplay", "idisplay", "adisplay"];
     var visibleDivId = null;
@@ -92,7 +92,7 @@ $(document).ready(function(){
     }
     attachEvents();
 
-    // JS: General way to put content into a modal on click
+    // javascript: General way to put content into a modal on click
     // Full code is in property-taxes-cook-county
     document.querySelector('body').classList.add('glossary');
     // Select all our term buttons.
